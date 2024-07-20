@@ -89,7 +89,7 @@ armarPares [] ys = []
 armarPares (x:xs) (y:ys) = (x,y) : armarPares xs ys
 
 mapDoble :: (a->b->c) -> [a] -> [b] -> [c] 
-mapDoble f xs ys =  mapPares f (armarPares xs ys)
+mapDoble f xs ys =  mapPares f (armar Pares xs ys)
 
 --ejercicio 11
 foldNat:: (Int -> a -> a) -> a -> Int -> a
@@ -119,7 +119,38 @@ esNil a =
         Nil -> True
         Bin _ _ _ -> False
 
--- \valor, llamado al fold izquierdo, llamado al fold derecho
 altura arbol = foldAB (\_ recI recD -> 1 +  max recI recD) 0 arbol
 nodos arbol = foldAB (\_ recI recD -> 1 + recI + recD) 0 arbol
+
+
+raiz (Bin i v d) = v
+izq:: AB a -> AB a
+izq (Bin i v d) = i
+der:: AB a -> AB a
+der (Bin i v d) = d
+
+mismaEstructura:: AB a -> AB a -> Bool
+mismaEstructura = foldAB (\v ri rd -> (\arbol -> if esNil arbol then False else ((ri (izq arbol))&&(rd (der arbol))))) 
+                        (\arbol -> esNil arbol)
+
+
+--ejercicio 15
+--le pongo binn xq sino crashea
+data AIH a = Hoja a | Binn (AIH a) (AIH a) 
+
+foldAIH :: (a->b) -> (b->b->b) -> AIH a -> b
+foldAIH fHoja fBin arbol = case arbol of 
+    Hoja x ->  fHoja x
+    (Binn i d) -> fBin (rec i) (rec d)
+    where rec = foldAIH fHoja fBin
+
+altura2 :: AIH a -> Integer
+altura2 = foldAIH (const 1) (\ri rd -> 1 + max ri rd)
+
+size = foldAIH (const 1) (\ri rd -> ri+rd)
+
+
+
+
+
 
